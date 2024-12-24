@@ -1,21 +1,25 @@
 "use client";
-import { useEffect, useState } from "react";
+
+import { useEffect, useState, useRef } from "react";
 import { Menu, MessageSquare, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { Room } from "../types/type";
+import { Message, Room } from "../types/type";
+
 import {
   addDoc,
   collection,
   DocumentData,
   onSnapshot,
+  doc,
 } from "firebase/firestore";
 import { getDb } from "../firebase/config";
 import { User } from "firebase/auth";
 import { getCurrentUserId } from "../actions/getUser";
 import Messages from "./Message";
 import ChatHeader from "./ChatHeader";
+import background from "../img/bg.jpg";
 
 export default function Sidebar({
   rooms,
@@ -23,69 +27,107 @@ export default function Sidebar({
   rooms: DocumentData | undefined;
 }) {
   const [currentRoom, setCurrentRoom] = useState<Room | undefined>(undefined);
-  const [currentRoomName, setCurrentRoomName] = useState<string>("room");
-  const [message, setMessage] = useState<DocumentData>();
-  const [currentUser, setCurrentUser] = useState<User>();
+  const [currentRoomName, setCurrentRoomName] = useState<string>("global");
+  const [message, setMessage] = useState<DocumentData>([]);
+  const [currentUser, setCurrentUser] = useState<User | undefined>(undefined);
   const [newMessage, setNewMessage] = useState("");
-
+  const [roomHeader, setRoomHeader] = useState<DocumentData>();
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newMessage.trim()) {
-      // Here you would typically send the message to your backend
-      const messagesRef = collection(
-        getDb,
-        "RoomChats",
-        currentRoomName,
-        "messages"
-      );
-      const res = await addDoc(messagesRef, {
-        senderId: currentUser?.displayName,
-        text: newMessage,
-        createdAt: new Date().toISOString(),
-      });
-      console.log("Sending message:", res);
-      setNewMessage("");
+      try {
+        const messagesRef = collection(
+          getDb,
+          "RoomChats",
+          currentRoomName,
+          "messages"
+        );
+        const res = await addDoc(messagesRef, {
+          senderId: currentUser?.displayName,
+          text: newMessage,
+          createdAt: new Date().toISOString(),
+        });
+        console.log("Message sent:", res);
+        setNewMessage("");
+      } catch (error) {
+        console.error("Error sending message:", error);
+      }
     }
   };
 
-  const getMessages = async () => {
+  const getMessages = () => {
+    if (!currentRoomName) {
+      console.warn("No room selected for fetching messages.");
+      return;
+    }
+
     const messagesRef = collection(
       getDb,
       "RoomChats",
       currentRoomName,
       "messages"
     );
+
     const unsubscribe = onSnapshot(messagesRef, (snapshot) => {
       const messages = snapshot.docs
         .map((doc) => ({
-          id: doc.id,
           ...doc.data(),
         }))
-        // Sort messages by createdAt in descending order (latest message first)
         .sort((a, b) => {
           const aDate = new Date(a.createdAt).getTime();
           const bDate = new Date(b.createdAt).getTime();
-          return aDate - bDate; // For descending order: return bDate - aDate;
+          return aDate - bDate; // Ascending order
         });
 
       setMessage(messages);
     });
+
     return unsubscribe;
   };
 
-  useEffect(() => {
-    const getUser = async () => {
-      const user = await getCurrentUserId();
-      if (user) {
-        setCurrentUser(user);
-      }
-    };
-    getUser();
+  const getRoom = () => {
+    if (!currentRoomName) {
+      console.warn("No room selected for fetching room details.");
+      return;
+    }
 
-    getMessages();
-  }, []);
-  console.log(currentRoomName, "ini di sidebar");
-  console.log(message, "ini di sidebar");
+    const roomRef = doc(getDb, "RoomChats", currentRoomName);
+
+    const unsubscribe = onSnapshot(roomRef, (snapshot) => {
+      if (snapshot.exists()) {
+        setRoomHeader(snapshot.data());
+      } else {
+        console.warn("Room data not found for:", currentRoomName);
+      }
+    });
+
+    return unsubscribe;
+  };
+
+  // Scroll to the bottom whenever messages change
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [message]);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const user = await getCurrentUserId();
+      if (user) setCurrentUser(user);
+    };
+
+    fetchUser();
+
+    const unsubscribeRoom = getRoom();
+    const unsubscribeMessages = getMessages();
+
+    return () => {
+      if (unsubscribeRoom) unsubscribeRoom();
+      if (unsubscribeMessages) unsubscribeMessages();
+    };
+  }, [currentRoomName]);
 
   return (
     <>
@@ -110,14 +152,14 @@ export default function Sidebar({
           <ul>
             {rooms?.map((room: Room, index: number) => (
               <li
+                key={index}
                 onClick={() => {
                   setCurrentRoom(room);
                   setCurrentRoomName(room.id);
                 }}
-                key={index}
                 className={`${
-                  currentRoom?.name === room.name ? "bg-slate-400" : ""
-                } flex items-center p-4 hover:bg-accent cursor-pointer`}>
+                  currentRoomName === room.id ? "bg-slate-400" : ""
+                } flex items-center p-4 cursor-pointer`}>
                 <Avatar className="h-10 w-10 mr-3">
                   <AvatarImage src={room.imgUrl} alt={room.name} />
                 </Avatar>
@@ -129,10 +171,13 @@ export default function Sidebar({
           </ul>
         </div>
       </div>
-      <div className="flex flex-col flex-1">
-        <ChatHeader />
+      <div className="flex flex-col bg-background  flex-1">
+        <ChatHeader room={roomHeader} />
         {/* Messages */}
-        <Messages message={message} currentUser={currentUser} />
+        <div className={`flex-1 overflow-y-auto bg-cover bg-center `}>
+          <Messages message={message} currentUser={currentUser} />
+          <div ref={messagesEndRef} />
+        </div>
 
         {/* Message Input */}
         <div className="p-4 border-t bg-background">

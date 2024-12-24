@@ -1,0 +1,67 @@
+/* Keyframe animation for background gradient */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Animated gradient for the background */
+.gradient-background {
+  background: linear-gradient(45deg, #ff6a00, #ee0979, #ff6a00, #ee0979);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+}
+
+/* Dark mode background gradient */
+.dark .gradient-background {
+  background: linear-gradient(45deg, #4b134f, #c94b4b, #4b134f, #c94b4b);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+}
+
+/* Apply gradient animation to the card */
+.gradient-card {
+  background: linear-gradient(45deg, #ff6a00, #ee0979, #ff6a00, #ee0979);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+  border-radius: 10px; /* Optional for rounded corners */
+}
+
+/* Dark mode card gradient */
+.dark .gradient-card {
+  background: linear-gradient(45deg, #4b134f, #c94b4b, #4b134f, #c94b4b);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+  border-radius: 10px;
+}
+
+/* Add gradient animation to the buttons */
+.gradient-btn {
+  background: linear-gradient(45deg, #ff6a00, #ee0979, #ff6a00, #ee0979);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  padding: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.gradient-btn:hover {
+  background-position: 100% 50%; /* Change background on hover */
+}
+
+/* Google and Facebook button icons styling */
+.gradient-btn .h-5,
+.gradient-btn .w-5 {
+  margin-right: 10px;
+}

@@ -1,5 +1,5 @@
 "use client";
-import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
+
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { FacebookAuthProvider } from "firebase/auth";
 

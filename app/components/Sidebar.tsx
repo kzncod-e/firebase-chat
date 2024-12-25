@@ -25,7 +25,6 @@ export default function Sidebar({
 }: {
   rooms: DocumentData | undefined;
 }) {
-  const [currentRoom, setCurrentRoom] = useState<Room | undefined>(undefined);
   const [currentRoomName, setCurrentRoomName] = useState<string>("global");
   const [message, setMessage] = useState<DocumentData>([]);
   const [currentUser, setCurrentUser] = useState<User | undefined>(undefined);
@@ -153,7 +152,6 @@ export default function Sidebar({
               <li
                 key={index}
                 onClick={() => {
-                  setCurrentRoom(room);
                   setCurrentRoomName(room.id);
                 }}
                 className={`${

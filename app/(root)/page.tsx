@@ -2,12 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import {
-  addDoc,
-  collection,
-  DocumentData,
-  onSnapshot,
-} from "firebase/firestore";
+import { collection, DocumentData, onSnapshot } from "firebase/firestore";
 import { getDb } from "../firebase/config";
 
 import Sidebar from "../components/Sidebar";

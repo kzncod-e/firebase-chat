@@ -6,7 +6,7 @@ import { Phone, Settings, Video, LogOut } from "lucide-react";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase/config";
 import { useRouter } from "next/navigation";
-import { Room } from "../types/type";
+
 import "../styles/style.css";
 import { DocumentData } from "firebase/firestore";
 import {

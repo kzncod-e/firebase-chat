@@ -5,7 +5,7 @@ import { app } from "../firebase/config";
 export const getCurrentUserId = async (): Promise<User | ""> => {
   const auth = getAuth(app);
 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         resolve(user); // Return the user ID

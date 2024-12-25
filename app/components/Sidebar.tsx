@@ -5,7 +5,7 @@ import { Menu, MessageSquare, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { Message, Room } from "../types/type";
+import { Room } from "../types/type";
 import "../styles/style.css";
 import {
   addDoc,
@@ -19,7 +19,6 @@ import { User } from "firebase/auth";
 import { getCurrentUserId } from "../actions/getUser";
 import Messages from "./Message";
 import ChatHeader from "./ChatHeader";
-import background from "../img/bg.jpg";
 
 export default function Sidebar({
   rooms,

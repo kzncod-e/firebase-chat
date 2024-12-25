@@ -26,7 +26,9 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "app/firebase/config.ts"
+    "app/firebase/config.ts",
+    "app/components/CardUi.jsx",
+    "app/components/Loader.jsx"
   ],
   "exclude": ["node_modules"]
 }

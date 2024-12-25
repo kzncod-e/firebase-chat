@@ -3,8 +3,9 @@
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { FacebookAuthProvider } from "firebase/auth";
 
+import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../firebase/config";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import "../../styles/style.css";
@@ -20,12 +21,15 @@ import {
 import Link from "next/link";
 import { Moon, Sun } from "lucide-react";
 import { FaGoogle, FaFacebook } from "react-icons/fa"; // Import Google and Facebook logos from react-icons
+import Loader from "@/app/components/Loader";
 
 const facebookProvider = new FacebookAuthProvider();
 const googleProvider = new GoogleAuthProvider();
 
 export default function SignUp() {
   const [darkMode, setDarkMode] = useState(false);
+  const [loading, setLoading] = useState(true);
+
   const router = useRouter();
 
   // Handle Google sign-in
@@ -60,6 +64,27 @@ export default function SignUp() {
     document.documentElement.classList.toggle("dark");
   };
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // Redirect to sign-in page if no user is logged in
+        router.push("/");
+      } else {
+        setLoading(false); // User is authenticated, stop loading
+      }
+    });
+
+    return () => unsubscribe(); // Cleanup subscription
+  }, [router]);
+
+  if (loading) {
+    // Optionally, show a loading spinner while checking auth
+    return (
+      <div>
+        <Loader />
+      </div>
+    );
+  }
   return (
     <>
       <div

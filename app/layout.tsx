@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+
 import "./globals.css";
 import "./styles/style.css";
 import { geistSans, geistMono } from "./fonts/font";

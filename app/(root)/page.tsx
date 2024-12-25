@@ -36,7 +36,7 @@ export default function ChatPage() {
 
   return (
     <AuthGuard>
-      <div className="flex h-screen bg-gray-100">
+      <div className="flex h-screen ">
         <Sidebar rooms={rooms} />
       </div>
     </AuthGuard>

@@ -7,6 +7,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../firebase/config";
 import { useRouter } from "next/navigation";
 import { Room } from "../types/type";
+import "../styles/style.css";
 import { DocumentData } from "firebase/firestore";
 import {
   Dialog,
@@ -37,7 +38,7 @@ export default function ChatHeader({
 
   return (
     <>
-      <div className="flex items-center justify-between p-4 border-b bg-background">
+      <div className="flex items-center shadow-2xl border-none justify-between p-4 border-b gradient-background">
         <div className="flex items-center">
           <Avatar className="h-10 w-10 mr-3">
             <AvatarImage src={room?.imgUrl} alt="Room Avatar" />

@@ -46,7 +46,7 @@
   background: linear-gradient(45deg, #ff6a00, #ee0979, #ff6a00, #ee0979);
   background-size: 400% 400%;
   animation: gradientShift 15s ease infinite;
-  border-radius: 8px;
+  border-radius: 10px;
   color: white;
   font-weight: bold;
   padding: 12px;

@@ -63,20 +63,36 @@ export default function SignUp() {
   return (
     <>
       <div
-        className={`min-h-screen flex items-center justify-center gradient-background ${
+        className={`min-h-screen font-vercetti flex items-center justify-center gradient-background ${
           darkMode ? "dark" : ""
         }`}>
         <Card className="w-full border-none shadow-2xl max-w-md card gradient-card">
           <CardHeader className="space-y-1">
             <div className="flex justify-between items-center">
-              <CardTitle className="text-2xl font-bold">
+              <CardTitle
+                className="text-2xl font-vercetti font-semibold"
+                style={{
+                  color: "#12c2e9", // Fallback for unsupported browsers
+                  background:
+                    "linear-gradient(to right, #f64f59, #c471ed, #12c2e9)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}>
                 Create an account
               </CardTitle>
+
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={toggleDarkMode}
-                aria-label="Toggle dark mode">
+                aria-label="Toggle dark mode"
+                style={{
+                  color: "#12c2e9", // Fallback for unsupported browsers
+                  background:
+                    "linear-gradient(to right, #f64f59, #c471ed, #12c2e9)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}>
                 {darkMode ? (
                   <Sun className="h-6 w-6" />
                 ) : (
@@ -84,28 +100,59 @@ export default function SignUp() {
                 )}
               </Button>
             </div>
-            <CardDescription>
+            <CardDescription
+              style={{
+                color: "#12c2e9", // Fallback for unsupported browsers
+                background:
+                  "linear-gradient(to right, #f64f59, #c471ed, #12c2e9)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}>
               Enter your information to create an account
             </CardDescription>
           </CardHeader>
           <CardContent></CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button
-              className="w-full sign-in-btn gradient-btn flex items-center justify-center gap-2"
-              variant="outline"
+              className="w-full shadow-2xl sign-in-btn gradient-btn flex items-center justify-center gap-2"
               onClick={handleGoogleSignIn}>
               <FaGoogle className="h-5 w-5" />
-              Sign up with Google
+              <p
+                style={{
+                  color: "#12c2e9", // Fallback for unsupported browsers
+                  background:
+                    "linear-gradient(to right, #f64f59, #c471ed, #12c2e9)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}>
+                Sign up with Google
+              </p>
             </Button>
             <Button
-              className="w-full sign-in-btn gradient-btn flex items-center justify-center gap-2"
-              variant="outline"
+              className="w-full shadow-2xl sign-in-btn gradient-btn flex items-center justify-center gap-2"
               onClick={handleFacebookSignIn}>
               <FaFacebook className="h-5 w-5" />
-              Sign up with Facebook
+              <p
+                style={{
+                  color: "#12c2e9", // Fallback for unsupported browsers
+                  background:
+                    "linear-gradient(to right, #f64f59, #c471ed, #12c2e9)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}>
+                Sign up with Facebook
+              </p>
             </Button>
 
-            <div className="text-sm text-center">
+            <div
+              className="text-sm text-center"
+              style={{
+                color: "#12c2e9", // Fallback for unsupported browsers
+                background:
+                  "linear-gradient(to right, #f64f59, #c471ed, #12c2e9)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}>
               Already have an account?{" "}
               <Link href="/sign-in" className="underline">
                 Sign in

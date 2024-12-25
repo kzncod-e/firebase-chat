@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Message, Room } from "../types/type";
-
+import "../styles/style.css";
 import {
   addDoc,
   collection,
@@ -131,19 +131,19 @@ export default function Sidebar({
 
   return (
     <>
-      <div className="hidden md:flex md:flex-col md:w-64 bg-background border-r">
+      <div className="hidden md:flex md:flex-col md:w-64 shadow-2xl border-none gradient-background border-r">
         <div className="flex items-center justify-between p-4 border-b">
           <h1 className="text-xl font-semibold">Chats</h1>
           <Button variant="ghost" size="icon">
             <Menu className="h-5 w-5" />
           </Button>
         </div>
-        <div className="p-4">
+        <div className="p-4 shadow-2xl border-none">
           <div className="relative">
             <Input
               type="text"
               placeholder="Search contacts..."
-              className="pl-10"
+              className="pl-10 shadow-2xl border-none inline-block"
             />
             <Search className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
           </div>
@@ -171,7 +171,7 @@ export default function Sidebar({
           </ul>
         </div>
       </div>
-      <div className="flex flex-col bg-background  flex-1">
+      <div className="flex flex-col gradient-background  flex-1">
         <ChatHeader room={roomHeader} />
         {/* Messages */}
         <div className={`flex-1 overflow-y-auto bg-cover bg-center `}>
@@ -180,7 +180,7 @@ export default function Sidebar({
         </div>
 
         {/* Message Input */}
-        <div className="p-4 border-t bg-background">
+        <div className="p-4 shadow-2xl border-none gradient-background">
           <form
             method="POST"
             onSubmit={handleSendMessage}

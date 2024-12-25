@@ -12,6 +12,10 @@ const geistMono = localFont({
   variable: "--font-geist-mono",
   weight: "100 900",
 });
+export const vercetti = localFont({
+  src: "./fonts/Vercetti-Regular.otf",
+  variable: "--font-vercetti",
+});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -26,7 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} gradient-background antialiased`}>
+        className={`${geistSans.variable} ${geistMono.variable} font-vercetti gradient-background antialiased`}>
         {children}
       </body>
     </html>

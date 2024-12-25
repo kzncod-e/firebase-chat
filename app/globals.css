@@ -2,18 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Global Font Settings */
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
+/* Custom Utilities */
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
 }
 
+/* Light and Dark Theme Variables */
 @layer base {
   :root {
+    /* Font Variables */
+    --font-geist-sans: "Geist Sans", sans-serif;
+    --font-geist-mono: "Geist Mono", monospace;
+    --font-vercetti: "Vercetti", serif;
+
+    /* Light Theme Variables */
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
@@ -40,6 +49,8 @@ body {
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
   }
+
+  /* Dark Theme Variables */
   .dark {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
@@ -68,11 +79,23 @@ body {
   }
 }
 
+/* Apply Base Styles */
 @layer base {
   * {
     @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Font Classes */
+  .font-geist-sans {
+    font-family: var(--font-geist-sans);
+  }
+  .font-geist-mono {
+    font-family: var(--font-geist-mono);
+  }
+  .font-vercetti {
+    font-family: var(--font-vercetti);
   }
 }

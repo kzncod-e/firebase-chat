@@ -1,11 +1,11 @@
 "use client";
-
-import { useEffect, useState, useRef } from "react";
-import { Menu, MessageSquare, Search } from "lucide-react";
+import React, { useEffect, useState, useRef } from "react";
+import { Camera, Menu, MessageSquare, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Room } from "../types/type";
+import { UploadButton } from "@/utils/uploadthing";
 import "../styles/style.css";
 import {
   addDoc,
@@ -19,6 +19,8 @@ import { User } from "firebase/auth";
 import { getCurrentUserId } from "../actions/getUser";
 import Messages from "./Message";
 import ChatHeader from "./ChatHeader";
+import { Label } from "@/components/ui/label";
+import Image from "next/image";
 
 export default function Sidebar({
   rooms,
@@ -27,12 +29,15 @@ export default function Sidebar({
 }) {
   const [currentRoomName, setCurrentRoomName] = useState<string>("global");
   const [message, setMessage] = useState<DocumentData>([]);
+  const [selectedFile, setSelectedFile] = useState<string | null>();
   const [currentUser, setCurrentUser] = useState<User | undefined>(undefined);
   const [newMessage, setNewMessage] = useState("");
   const [roomHeader, setRoomHeader] = useState<DocumentData>();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (newMessage.trim()) {
       try {
         const messagesRef = collection(
@@ -41,13 +46,28 @@ export default function Sidebar({
           currentRoomName,
           "messages"
         );
-        const res = await addDoc(messagesRef, {
+
+        let file = null;
+        if (selectedFile) {
+          // Upload image and get the URL
+
+          file = selectedFile;
+        }
+
+        // Create the message object
+        const messageData = {
           senderId: currentUser?.displayName,
           text: newMessage,
           createdAt: new Date().toISOString(),
-        });
+          imgUrl: file ? file : "",
+        };
+
+        // Add the message to Firestore
+        const res = await addDoc(messagesRef, messageData);
         console.log("Message sent:", res);
-        setNewMessage("");
+
+        setNewMessage(""); // Clear input after sending
+        setSelectedFile(null);
       } catch (error) {
         console.error("Error sending message:", error);
       }
@@ -129,8 +149,8 @@ export default function Sidebar({
 
   return (
     <>
-      <div className="hidden md:flex md:flex-col md:w-64 shadow-2xl border-none gradient-background border-r">
-        <div className="flex items-center justify-between p-4 border-b">
+      <div className="hidden md:flex md:flex-col md:w-64 shadow-2xl border-none gradient-background text-[#eaafc8] border-r">
+        <div className="flex items-center justify-between p-4 shadow-2xl">
           <h1 className="text-xl font-semibold">Chats</h1>
           <Button variant="ghost" size="icon">
             <Menu className="h-5 w-5" />
@@ -168,31 +188,66 @@ export default function Sidebar({
           </ul>
         </div>
       </div>
-      <div className="flex flex-col gradient-background  flex-1">
+      <div className="flex flex-col gradient-background text-[#FDC830] flex-1">
         <ChatHeader room={roomHeader} />
         {/* Messages */}
-        <div className={`flex-1 overflow-y-auto bg-cover bg-center `}>
+        <div className={`flex-1 overflow-y-auto bg-cover bg-center`}>
           <Messages message={message} currentUser={currentUser} />
           <div ref={messagesEndRef} />
         </div>
 
         {/* Message Input */}
         <div className="p-4 shadow-2xl border-none gradient-background">
-          <form
-            method="POST"
-            onSubmit={handleSendMessage}
-            className="flex items-center space-x-2">
-            <Input
-              type="text"
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Type a message..."
-              className="flex-1"
-            />
-            <Button type="submit" size="icon">
+          <div className="flex items-center space-x-2">
+            <div className="border-none flex shadow-inner items-center rounded-xl gradient-background w-full">
+              <Label htmlFor="dropzone-file" className="cursor-pointer">
+                <Camera />
+                <UploadButton
+                  endpoint="imageUploader"
+                  onClientUploadComplete={(res) => {
+                    // Do something with the response
+                    console.log("Files: ", res);
+                    setSelectedFile(res[0].url);
+                    alert("Upload Completed");
+                  }}
+                  onUploadError={(error: Error) => {
+                    // Do something with the error.
+                    alert(`ERROR! ${error.message}`);
+                  }}
+                />
+              </Label>
+
+              <Input
+                type="text"
+                value={`${newMessage}`}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder="Type a message..."
+                className="flex-1 shadow-current border-none shadow-2xl"
+              />
+              {selectedFile && (
+                <div className="flex items-center gap-2">
+                  <Image
+                    src={selectedFile}
+                    alt="Selected"
+                    width={100}
+                    height={100}
+                    className="w-16 h-16 object-cover rounded"
+                  />
+                  <button
+                    onClick={() => setSelectedFile(null)}
+                    className="text-red-500 hover:underline">
+                    Remove
+                  </button>
+                </div>
+              )}
+            </div>
+            <Button
+              onClick={handleSendMessage}
+              className="gradient-background"
+              size="icon">
               <MessageSquare className="h-5 w-5" />
             </Button>
-          </form>
+          </div>
         </div>
       </div>
     </>

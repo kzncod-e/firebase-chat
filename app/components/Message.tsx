@@ -3,6 +3,7 @@
 import { User } from "firebase/auth";
 import type { Message } from "../types/type";
 import { DocumentData } from "firebase/firestore";
+import Image from "next/image";
 
 export default function Messages({
   message,
@@ -34,7 +35,19 @@ export default function Messages({
                     ? "you"
                     : msg.senderId}
                 </p>
-                <p>{msg.text}</p>
+                <div className="flex flex-col">
+                  {msg.imgUrl && (
+                    <>
+                      <Image
+                        src={msg.imgUrl}
+                        alt="image"
+                        height={200}
+                        width={200}></Image>
+                    </>
+                  )}
+                  <p className="">{msg.text}</p>
+                </div>
+
                 <p className="text-xs text-right mt-1 opacity-70"></p>
               </div>
             </div>

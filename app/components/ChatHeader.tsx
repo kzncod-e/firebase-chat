@@ -62,7 +62,9 @@ export default function ChatHeader({
           {/* Sign-Out Button */}
           <Dialog>
             <DialogTrigger>
-              <LogOut className="h-5 w-5 text-red-500" />
+              <Button variant="ghost" size="icon">
+                <LogOut className="h-5 w-5" />
+              </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>

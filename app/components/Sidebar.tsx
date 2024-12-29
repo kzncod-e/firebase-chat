@@ -21,12 +21,13 @@ import Messages from "./Message";
 import ChatHeader from "./ChatHeader";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
-
+import { LoaderImage } from "./Loader2";
 export default function Sidebar({
   rooms,
 }: {
   rooms: DocumentData | undefined;
 }) {
+  const [loading, setLoading] = useState(false);
   const [currentRoomName, setCurrentRoomName] = useState<string>("global");
   const [message, setMessage] = useState<DocumentData>([]);
   const [selectedFile, setSelectedFile] = useState<string | null>();
@@ -37,40 +38,32 @@ export default function Sidebar({
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!selectedFile && !newMessage) return null;
+    try {
+      const messagesRef = collection(
+        getDb,
+        "RoomChats",
+        currentRoomName,
+        "messages"
+      );
+      console.log(selectedFile);
 
-    if (newMessage.trim()) {
-      try {
-        const messagesRef = collection(
-          getDb,
-          "RoomChats",
-          currentRoomName,
-          "messages"
-        );
+      // Create the message object
+      const messageData = {
+        senderId: currentUser?.displayName,
+        text: newMessage ? newMessage : null,
+        imgUrl: selectedFile ? selectedFile : null,
+        createdAt: new Date().toISOString(),
+      };
 
-        let file = null;
-        if (selectedFile) {
-          // Upload image and get the URL
+      // Add the message to Firestore
+      const res = await addDoc(messagesRef, messageData);
+      console.log("Message sent:", res);
 
-          file = selectedFile;
-        }
-
-        // Create the message object
-        const messageData = {
-          senderId: currentUser?.displayName,
-          text: newMessage,
-          createdAt: new Date().toISOString(),
-          imgUrl: file ? file : "",
-        };
-
-        // Add the message to Firestore
-        const res = await addDoc(messagesRef, messageData);
-        console.log("Message sent:", res);
-
-        setNewMessage(""); // Clear input after sending
-        setSelectedFile(null);
-      } catch (error) {
-        console.error("Error sending message:", error);
-      }
+      setNewMessage(""); // Clear input after sending
+      setSelectedFile(null);
+    } catch (error) {
+      console.error("Error sending message:", error);
     }
   };
 
@@ -146,10 +139,18 @@ export default function Sidebar({
       if (unsubscribeMessages) unsubscribeMessages();
     };
   }, [currentRoomName]);
+  console.log(loading);
 
   return (
     <>
-      <div className="hidden md:flex md:flex-col md:w-64 shadow-2xl border-none gradient-background text-[#eaafc8] border-r">
+      {loading && (
+        <div className="absolute inset-0 flex justify-center items-center bg-opacity-50 bg-black z-50">
+          <div className="  w-16 h-16 ">
+            <LoaderImage />
+          </div>
+        </div>
+      )}
+      <div className="hidden relative md:flex md:flex-col md:w-64 shadow-2xl border-none gradient-background text-[#eaafc8] border-r">
         <div className="flex items-center justify-between p-4 shadow-2xl">
           <h1 className="text-xl font-semibold">Chats</h1>
           <Button variant="ghost" size="icon">
@@ -203,19 +204,26 @@ export default function Sidebar({
               <Label htmlFor="dropzone-file" className="cursor-pointer">
                 <Camera className="absolute left-8 top-5" />
                 <UploadButton
-                  className="ut-button:opacity-0 ut-button:w-8  "
+                  className="ut-button:opacity-0 ut-button:w-8"
                   appearance={{
                     allowedContent: "opacity-0",
                   }}
                   endpoint="imageUploader"
+                  onBeforeUploadBegin={(files) => {
+                    setLoading(true);
+                    // Preprocess files before uploading (e.g. rename them)
+                    return files.map(
+                      (f) =>
+                        new File([f], "renamed-" + f.name, { type: f.type })
+                    );
+                  }}
                   onClientUploadComplete={(res) => {
-                    // Do something with the response
                     console.log("Files: ", res);
-                    setSelectedFile(res[0].url);
-                    alert("Upload Completed");
+                    setSelectedFile(res[0].url); // Set the uploaded file URL
+                    setLoading(false); // Set loading to false once upload completes
                   }}
                   onUploadError={(error: Error) => {
-                    // Do something with the error.
+                    setLoading(false); // Set loading to false in case of error
                     alert(`ERROR! ${error.message}`);
                   }}
                 />

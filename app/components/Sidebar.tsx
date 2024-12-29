@@ -199,10 +199,14 @@ export default function Sidebar({
         {/* Message Input */}
         <div className="p-4 shadow-2xl border-none gradient-background">
           <div className="flex items-center space-x-2">
-            <div className="border-none flex shadow-inner items-center rounded-xl gradient-background w-full">
+            <div className="border-none relative flex shadow-inner items-center rounded-xl gradient-background w-full">
               <Label htmlFor="dropzone-file" className="cursor-pointer">
-                <Camera />
+                <Camera className="absolute left-8 top-5" />
                 <UploadButton
+                  className="ut-button:opacity-0 ut-button:w-8  "
+                  appearance={{
+                    allowedContent: "opacity-0",
+                  }}
                   endpoint="imageUploader"
                   onClientUploadComplete={(res) => {
                     // Do something with the response

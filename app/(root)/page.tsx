@@ -7,6 +7,7 @@ import { getDb } from "../firebase/config";
 
 import Sidebar from "../components/Sidebar";
 import AuthGuard from "../components/AuthGuard";
+import StreamVideoProvider from "../components/sreamAction";
 
 export default function ChatPage() {
   const [rooms, setRooms] = useState<DocumentData>();
@@ -31,9 +32,10 @@ export default function ChatPage() {
 
   return (
     <AuthGuard>
-      <div className="flex h-screen ">
+      {/* <div className="flex  h-screen ">
         <Sidebar rooms={rooms} />
-      </div>
+      </div> */}
+      <StreamVideoProvider />
     </AuthGuard>
   );
 }

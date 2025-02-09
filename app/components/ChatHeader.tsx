@@ -18,6 +18,7 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
+import Link from "next/link";
 
 export default function ChatHeader({
   room,
@@ -54,7 +55,9 @@ export default function ChatHeader({
             <Phone className="h-5 w-5" />
           </Button>
           <Button variant="ghost" size="icon">
-            <Video className="h-5 w-5" />
+            <Link href="/video">
+              <Video className="h-5 w-5" />
+            </Link>
           </Button>
           <Button variant="ghost" size="icon">
             <Settings className="h-5 w-5" />

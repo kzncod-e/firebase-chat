@@ -6,7 +6,7 @@ import serviceAccount from "@/utils/my-project-86f7e-firebase-adminsdk-12lq5-0dd
 // ensure the Firebase Admin SDK is initialized only once
 if (!admin.apps.length) {
   admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
+    credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
     databaseURL: "https://my-project-86f7e-default-rtdb.firebaseio.com",
   });
 }

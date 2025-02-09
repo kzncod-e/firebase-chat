@@ -8,10 +8,16 @@ import {
   Call,
   StreamTheme,
   useCallStateHooks,
-  useCall,
   CallingState,
+  SpeakerLayout,
+  CallControls,
 } from "@stream-io/video-react-sdk";
-import { getCurrentUserId } from "../actions/getUser";
+import { getCurrentUserId } from "../../actions/getUser";
+import { MyParticipantList } from "../../components/Participant";
+
+import "@stream-io/video-react-sdk/dist/css/styles.css";
+import "../../styles/style.css";
+import { Button } from "@/components/ui/button";
 
 const apiKey = process.env.NEXT_PUBLIC_STREAM_IO_API_KEY ?? "";
 const callId = process.env.NEXT_PUBLIC_STREAM_IO_CALL_ID ?? "";
@@ -25,22 +31,21 @@ if (!apiKey || !callId) {
 export default function StreamVideoProvider() {
   const [client, setClient] = useState<StreamVideoClient | null>(null);
   const [call, setCall] = useState<Call | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const initializeClient = async () => {
       try {
         const currentUser = await getCurrentUserId();
         if (!currentUser) {
-          console.error(
+          throw new Error(
             "Current user not found. Cannot initialize video client."
           );
-          return;
         }
 
         const userId = currentUser.uid;
-
-        // Fetch Firebase token and Stream token
         const generateToken = await currentUser.getIdToken();
+
         const response = await fetch("http://localhost:3000/api/stream", {
           method: "POST",
           headers: {
@@ -49,12 +54,15 @@ export default function StreamVideoProvider() {
           body: JSON.stringify({ firebaseIdToken: generateToken }),
         });
 
-        const { streamToken } = await response.json();
-        if (!streamToken) {
+        if (!response.ok) {
           throw new Error("Failed to fetch Stream token");
         }
 
-        // Initialize Stream Video Client
+        const { streamToken } = await response.json();
+        if (!streamToken) {
+          throw new Error("Stream token is missing in the response");
+        }
+
         const videoClient = new StreamVideoClient({
           apiKey,
           user: { id: userId, name: currentUser.displayName || userId },
@@ -63,63 +71,72 @@ export default function StreamVideoProvider() {
 
         const videoCall = videoClient.call("default", callId);
 
-        // Attempt to join the call
-        try {
-          await videoCall.join({ create: true });
-          console.log("Successfully joined the call.");
-          setClient(videoClient);
-          setCall(videoCall);
-        } catch (error) {
-          console.error("Error joining the call:", error);
-        }
-
-        console.log("Stream Video Client and Call initialized successfully.");
+        setClient(videoClient);
+        setCall(videoCall);
+        console.log("Stream Video Client initialized successfully.");
       } catch (error) {
         console.error("Error initializing Stream Video client or call:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     initializeClient();
   }, []);
 
-  if (!client || !call) {
+  if (loading) {
     return <div>Loading Stream Video...</div>;
+  }
+
+  if (!client || !call) {
+    return (
+      <div>Unable to initialize the video call. Please try again later.</div>
+    );
   }
 
   return (
     <StreamVideo client={client}>
       <StreamTheme>
         <StreamCall call={call}>
-          <MyUILayout />
+          <MyUILayout call={call} />
         </StreamCall>
       </StreamTheme>
     </StreamVideo>
   );
 }
 
-export const MyUILayout = () => {
-  const call = useCall();
-  const { useCallCallingState, useParticipantCount } = useCallStateHooks();
+export const MyUILayout = ({ call }: { call: Call }) => {
+  const { useCallCallingState, useRemoteParticipants } = useCallStateHooks();
+
   const callingState = useCallCallingState();
-  const participantCount = useParticipantCount();
+  const remoteParticipants = useRemoteParticipants();
 
-  useEffect(() => {
-    console.log("Calling State:", callingState);
-    console.log("Participant Count:", participantCount);
-  }, [callingState, participantCount]);
-
-  if (!call) {
-    return <div>Call is not available</div>;
-  }
+  const handleJoinCall = async () => {
+    try {
+      await call.getOrCreate();
+      await call.join();
+      console.log("Successfully joined the call.");
+    } catch (error) {
+      console.error("Error joining the call:", error);
+    }
+  };
 
   if (callingState !== CallingState.JOINED) {
-    return <div>Joining call... Current state: {callingState}</div>;
+    return (
+      <div className="flex bg-white h-[100vh]  text-black justify-center  item-center w-full">
+        <div className="flex items-center justify-center gap-4 flex-col">
+          Call is not active. Click the button to join.
+          <Button onClick={handleJoinCall}>Join Call</Button>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div>
-      Call &quot;{call.id}&quot; is active with {participantCount}{" "}
-      participant(s).
-    </div>
+    <StreamTheme>
+      <MyParticipantList participants={remoteParticipants} />
+      <SpeakerLayout participantsBarPosition="bottom" />
+      <CallControls />
+    </StreamTheme>
   );
 };

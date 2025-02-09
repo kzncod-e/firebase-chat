@@ -4,7 +4,6 @@ import { NextResponse } from "next/server";
 export const POST = async (req: Request) => {
   const body = await req.json();
   const { firebaseIdToken } = body;
-  console.log("Firebase ID Token:", body);
 
   if (!firebaseIdToken) {
     return NextResponse.json({ error: "Firebase ID token is required" });

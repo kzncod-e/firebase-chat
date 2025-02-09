@@ -29,7 +29,7 @@ export default function ChatPage() {
       // Optionally, you can return the unsubscribe function to stop listening for changes
       return unsubscribe;
     } catch (error) {
-      console.log(`error happen while getting room`);
+      console.log(`error happen while getting room ${error}`);
     }
   };
 

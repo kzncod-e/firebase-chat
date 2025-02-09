@@ -72,29 +72,32 @@ export default function Sidebar({
       console.warn("No room selected for fetching messages.");
       return;
     }
+    try {
+      const messagesRef = collection(
+        getDb,
+        "RoomChats",
+        currentRoomName,
+        "messages"
+      );
 
-    const messagesRef = collection(
-      getDb,
-      "RoomChats",
-      currentRoomName,
-      "messages"
-    );
+      const unsubscribe = onSnapshot(messagesRef, (snapshot) => {
+        const messages = snapshot.docs
+          .map((doc) => ({
+            ...doc.data(),
+          }))
+          .sort((a, b) => {
+            const aDate = new Date(a.createdAt).getTime();
+            const bDate = new Date(b.createdAt).getTime();
+            return aDate - bDate; // Ascending order
+          });
 
-    const unsubscribe = onSnapshot(messagesRef, (snapshot) => {
-      const messages = snapshot.docs
-        .map((doc) => ({
-          ...doc.data(),
-        }))
-        .sort((a, b) => {
-          const aDate = new Date(a.createdAt).getTime();
-          const bDate = new Date(b.createdAt).getTime();
-          return aDate - bDate; // Ascending order
-        });
+        setMessage(messages);
+      });
 
-      setMessage(messages);
-    });
-
-    return unsubscribe;
+      return unsubscribe;
+    } catch (error) {
+      console.log(`error happen while getting room ${error}`);
+    }
   };
 
   const getRoom = () => {
